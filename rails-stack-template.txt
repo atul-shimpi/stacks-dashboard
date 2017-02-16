@@ -904,7 +904,7 @@
                   "export HOME=/home/ec2-user\n",
                   "export PATH=$PATH:/usr/local/bin\n",
                   "cd /home/ec2-user/stacks-dashboard/src\n",
-                  "sudo chmod -R ugo+rwx .\n" 
+                  "sudo chmod -R ugo+rwx .\n",
                   "# Startup the application\n",
                   "rails server --binding 0.0.0.0 -p 3000 -d\n"
                 ]]},
