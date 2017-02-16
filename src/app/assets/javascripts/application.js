@@ -16,11 +16,14 @@
 //= require_tree .
 
 var app = angular.module('myApp', []);
-app.controller('dashboardCtrl', function($scope, $http) {
+app.controller('dashboardCtrl', function($scope, $http, $interval) {
     initialize();
     
     function initialize() {
      refresh_();
+     
+     // autofresh page after every 5 minutes
+     $interval(refresh_, 60000 * 5);
     }
    
     $scope.refresh = function() {
@@ -28,6 +31,8 @@ app.controller('dashboardCtrl', function($scope, $http) {
     };
     
     function refresh_() {
+      //alert('rererew');
+      $scope.error = false;
       get_stacks();
     }
     
@@ -43,14 +48,15 @@ app.controller('dashboardCtrl', function($scope, $http) {
       })
       .error(function(data, status, headers, config) {
       $scope.refreshing = false;
-      alert("Cannot get stacks. Set the access keys.");
+      $scope.error = true;
       });
     }
     
     $scope.onClickSaveAccessKeysBtn = function() {    
       $http.post('/access-keys', $scope.accessKeysForm )
         .success(function(data, status, headers, config) {  
-        $scope.message = data;
+         $scope.message = data;
+         $scope.refresh();
       })
       .error(function(data, status, headers, config) {
         alert( "failure message: " + JSON.stringify({data: data}));

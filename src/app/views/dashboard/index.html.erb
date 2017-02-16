@@ -1,14 +1,20 @@
+<div style="margin: auto; width: 50%;" ng-show="error" class = "alert alert-danger">Error while getting data. Please set access keys</div>
 <button 
   style="width: 130px; margin-left: 5px;" type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">
   Set Access Keys
  </button>
  
-<button style="width: 130px;" ng-click="refresh()" type="button" class="btn btn-default">
+<button style="margin-left: 10px;width: 130px;" ng-click="refresh()" type="button" class="btn btn-default">
 Refresh
  <span ng-show="refreshing">
     <i class="fa fa-spinner fa-spin"></i>
   </span>
 </button>
+
+  <label class="active" style="font-weight: normal; margin-left: 10px; display: inline;">
+        <input type="checkbox" checked>&nbsp&nbspAuto refresh after every 5 minutes
+      </label>
+
 <!-- Modal -->
 <div id="myModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -81,6 +87,10 @@ Refresh
     <td>{{stack.region}}</td>
     <td>{{stack.name}}</td>
     <td>{{stack.description}}</td>
-    <td><a href={{stack.app_url}}>{{stack.app_url}}</a></td>
+    <td><a href={{stack.app_url}}>Open</a></td>
+    <td>0/0</td>
+    <td>0 %</td>
+    <td>0</td>
+    <td>{{stack.stack_status}}</td>
   </tr>
 </table>  
