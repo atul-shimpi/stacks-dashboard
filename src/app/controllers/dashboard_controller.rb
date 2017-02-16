@@ -1,25 +1,36 @@
 require 'aws-sdk'
+load 'stack_dash.rb'
 
 class DashboardController < ApplicationController
   def index
   end
   
-  def get_stacks
+  def get_stacks     
     Aws.use_bundled_cert!
-
+    
     Aws.config.update({
       region: 'us-east-1',
-      credentials: Aws::Credentials.new('xxx', 'xxx')
+      credentials: Aws::Credentials.new(ENV['access-key'], ENV['secret-key'])
     })
 
-    cf = Aws::CloudFormation::Client.new()
-    stacks =  cf.describe_stacks
-    
-    response = []
-    stacks.each do |stack|
+    stacks = []
+    regions.each do |region|
+      stacks_aws = Aws::CloudFormation::Client.new(region: region[:short_name]).describe_stacks.stacks 
+          
+      stacks_aws.each do |stack_aws|
+        stack_dash = StackDash.new
+       
+        stack_dash.stack_id = stack_aws.stack_id
+        stack_dash.creation_time = stack_aws.creation_time
+        stack_dash.region = region[:name]
+        stack_dash.description = stack_aws.description
+        stack_dash.name = stack_aws.stack_name
+        #stack_dash.app_url = stack_aws.stack_name
+        stacks.push(stack_dash)
+      end
     end
     
-    render json: response
+    render json: stacks
   end
   
   def save_access_keys

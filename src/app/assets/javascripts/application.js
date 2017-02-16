@@ -20,28 +20,32 @@ app.controller('dashboardCtrl', function($scope, $http) {
     initialize();
     
     function initialize() {
-      $http.get('/access-keys', $scope.accessKeysForm )
-        .success(function(data, status, headers, config) {  
-        $scope.accessKeysForm = data.keys;      
-      })
-      .error(function(data, status, headers, config) {
-      alert( "failure message: " + JSON.stringify({data: data}));
-      });
+     refresh_();
     }
    
     $scope.refresh = function() {
+      refresh_();
+    };
+    
+    function refresh_() {
+      get_stacks();
+    }
+    
+    function get_stacks() {
       $scope.refreshing = true;
       
       $http.get('/stacks', $scope.accessKeysForm )
         .success(function(data, status, headers, config) {  
         $scope.refreshing = false;
-        alert(angular.toJson(data));
+        console.log(data);
+        $scope.stacks = data;
+        //alert(angular.toJson(data));
       })
       .error(function(data, status, headers, config) {
       $scope.refreshing = false;
-      alert( "failure message: " + JSON.stringify({data: data}));
+      alert("Cannot get stacks. Set the access keys.");
       });
-    };
+    }
     
     $scope.onClickSaveAccessKeysBtn = function() {    
       $http.post('/access-keys', $scope.accessKeysForm )

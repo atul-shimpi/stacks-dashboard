@@ -1,9 +1,9 @@
 <button 
-  style="margin-left: 5px;" type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">
+  style="width: 130px; margin-left: 5px;" type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">
   Set Access Keys
  </button>
  
-<button ng-click="refresh()" type="button" class="btn btn-default">
+<button style="width: 130px;" ng-click="refresh()" type="button" class="btn btn-default">
 Refresh
  <span ng-show="refreshing">
     <i class="fa fa-spinner fa-spin"></i>
@@ -66,12 +66,20 @@ Refresh
 <p>
 <table id="tickets" class="table table-striped">      
   <tr>
-     <th>Stack Name</th>
+     <th>Created At</th>
      <th>Region</th>
-     <th>Url</th>
+     <th>Stack Name</th>
+     <th>Description</th>
+     <th>MyBB Url</th>
      <th>Healthy Web Servers</th>     
      <th>Avg CPU Usage</th>
      <th>Avg Network Data In/Out</th>     
      <th>Status</th>
-  </tr>   
+  </tr>  
+  <tr ng-repeat="stack in stacks track by $index">  
+    <td>{{stack.creation_time | date:'dd-MMM-yyyy H:mm'}}</td>
+    <td>{{stack.region}}</td>
+    <td>{{stack.name}}</td>
+    <td>{{stack.description}}</td>
+  </tr>
 </table>  
