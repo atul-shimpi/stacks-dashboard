@@ -884,14 +884,12 @@
                   "# your application package and perform any configuration here.\n",
                   "# Create a new application, with therubyracer javascript library\n",
                   "rails new sample -d mysql --skip-spring --skip-bundle --force\n",
-                  "cd /home/ec2-user/sample\n",
+                  "cd /home/ec2-user\n",
                   "git clone https://github.com/atul-shimpi/stacks-dashboard\n",
-                  "sed -i 's/^# \\(.*therubyracer.*$\\)/\\1/' Gemfile\n",
-                  "bundle install\n",
-
-                  "# Create a sample scoffold\n",
-                  "rails generate scaffold Note title:string body:text --force\n",
-
+                  "# sed -i 's/^# \\(.*therubyracer.*$\\)/\\1/' Gemfile\n",
+                  "cd /home/ec2-user/stacks-dashboard/src\n",
+                  "sudo chmod -R ugo+rwx /usr/local/rvm/gems/ruby-2.3.1/wrappers\n",
+                  "bundle install\n",      
                   "# Configure the database connection\n",
                   "mv /tmp/database.yml config\n",
                   "rake db:create db:migrate\n"
@@ -907,7 +905,7 @@
                   "rvm use 2.3.1\n",
                   "export HOME=/home/ec2-user\n",
                   "export PATH=$PATH:/usr/local/bin\n",
-                  "cd /home/ec2-user/sample\n",
+                  "cd /home/ec2-user/stacks-dashboard/src\n",
 
                   "# Startup the application\n",
                   "rails server --binding 0.0.0.0 -p 3000 -d\n"
