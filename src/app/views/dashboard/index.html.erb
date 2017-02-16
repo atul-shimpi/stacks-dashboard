@@ -70,7 +70,7 @@ Refresh
      <th>Region</th>
      <th>Stack Name</th>
      <th>Description</th>
-     <th>MyBB Url</th>
+     <th style="width: 100px;">MyBB Url</th>
      <th>Healthy Web Servers</th>     
      <th>Avg CPU Usage</th>
      <th>Avg Network Data In/Out</th>     
@@ -81,5 +81,6 @@ Refresh
     <td>{{stack.region}}</td>
     <td>{{stack.name}}</td>
     <td>{{stack.description}}</td>
+    <td><a href={{stack.app_url}}>{{stack.app_url}}</a></td>
   </tr>
 </table>  

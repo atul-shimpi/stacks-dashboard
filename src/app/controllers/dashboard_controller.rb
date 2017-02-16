@@ -19,13 +19,17 @@ class DashboardController < ApplicationController
           
       stacks_aws.each do |stack_aws|
         stack_dash = StackDash.new
-       
+        
         stack_dash.stack_id = stack_aws.stack_id
         stack_dash.creation_time = stack_aws.creation_time
         stack_dash.region = region[:name]
         stack_dash.description = stack_aws.description
         stack_dash.name = stack_aws.stack_name
-        #stack_dash.app_url = stack_aws.stack_name
+        
+        stack_aws.outputs.each do |output|
+          stack_dash.app_url = output.output_value if output.output_key == 'WebSite'
+        end
+        
         stacks.push(stack_dash)
       end
     end
