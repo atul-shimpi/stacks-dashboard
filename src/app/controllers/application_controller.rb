@@ -7,7 +7,7 @@ class ApplicationController < ActionController::Base
     ]
   end
   
-  def regions_    
+  def regions_  
     [ 
       {name: 'US East (N. Virginia)', short_name: 'us-east-1'},
       {name: 'US East (Ohio)', short_name: 'us-east-2'},

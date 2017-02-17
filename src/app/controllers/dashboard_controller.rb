@@ -5,7 +5,13 @@ class DashboardController < ApplicationController
   def index
   end
   
-  def get_stacks     
+  def get_stacks
+    puts get_data_usage('us-east-1', 'MyBB-MyBBWebServerAutoscalingGroup-1RIU05EX08YSR')
+    
+    render json: { stacks: 'Atul Shmpi' }
+  end
+  
+  def get_stacks_
     Aws.use_bundled_cert!
     
     Aws.config.update({
@@ -34,7 +40,13 @@ class DashboardController < ApplicationController
         
         stack_dash.stack_status = stack_aws.stack_status
         
-        get_elb_status(cf_client, stack_dash.name)
+        # get metrics
+        metrics =  get_metrics(region[:short_name], cf_client, stack_dash.name)
+        
+        stack_dash.healthy_instances = metrics[:healthy_instances_count]
+        stack_dash.cpu_usage = metrics[:cpu_usage]
+        stack_dash.data_usage = metrics[:data_usage]
+        
         stacks.push(stack_dash)
       end
     end
@@ -42,10 +54,111 @@ class DashboardController < ApplicationController
     render json: stacks
   end
   
-  def get_elb_status(cf_client, stack_name)
-    resp = cf_client.describe_stack_resource({stack_name: "StackName", logical_resource_id: "LogicalResourceId"})
+  def get_metrics(region, cf_client, stack_name)
+    # get resources    
+    resources = get_resources(region, cf_client, stack_name)
     
-    puts "rere " + resp
+    # get metrics
+    metrics = {}
+    
+    # get healthy instances count
+    metrics[:healthy_instances_count] = get_healthy_instances_count(region, resources[:elb_name])
+    # get cpu usage
+    metrics[:cpu_usage] = get_cpu_usage(region, resources[:asg_name])   
+    
+    metrics
+  end
+  
+  def get_resources(region, cf_client, stack_name)
+    resources = {}
+    
+    # get load balancer name
+    begin
+      resources[:elb_name] = cf_client.describe_stack_resource({
+          stack_name: stack_name,
+          logical_resource_id: "PublicElasticLoadBalancer"
+        }).stack_resource_detail['physical_resource_id']
+    rescue
+      resources[:elb_name] = nil
+    end
+    
+    # get asg name
+    begin
+      resources[:asg_name] = cf_client.describe_stack_resource({
+          stack_name: stack_name,
+          logical_resource_id: "MyBBWebServerAutoscalingGroup"
+        }).stack_resource_detail['physical_resource_id']
+    rescue
+      resources[:asg_name] = nil
+    end
+    
+    resources
+  end
+   
+  def get_healthy_instances_count(region, elb_name)
+    return 'Not Available' if elb_name.nil? 
+    
+    begin      
+      # get load balancer instance details
+      instances_health = Aws::ElasticLoadBalancing::Client.new(region: region)
+        .describe_instance_health({
+          load_balancer_name: elb_name
+        })
+        .instance_states
+    
+      healthy_instances_count = 0
+      instances_health.each do |instance|       
+        healthy_instances_count = healthy_instances_count + 1 if instance[:state] = 'InService'
+      end
+      
+      "#{healthy_instances_count} of #{instances_health.size}"
+    rescue
+     "Not Available"
+   end
+  end
+  
+  def get_cpu_usage(region, asg_name)
+    return 'Not Available' if asg_name.nil? 
+    
+    begin      
+      metrics = Aws::CloudWatch::Client.new(region: region)
+        .get_metric_statistics({
+          namespace: 'AWS/EC2',
+          metric_name: 'CPUUtilization',
+          dimensions: [{ name: 'AutoScalingGroupName', value: asg_name }],
+          start_time: 30.minutes.ago,
+          end_time: Time.now,
+          statistics: ['Average'],
+          period: 30 * 60
+        }) 
+      
+      "#{metrics.datapoints[0][:average].round(2)} %"
+    rescue
+      'Not Available'
+   end   
+  end
+  
+  def get_data_usage(region, asg_name)
+    return 'Not Available' if asg_name.nil? 
+    
+    #begin      
+      metrics = Aws::CloudWatch::Client.new(region: region)
+        .get_metric_statistics({
+          namespace: 'AWS/EC2',
+          metric_name: 'NetworkOut',
+          dimensions: [{ name: 'AutoScalingGroupName', value: asg_name }],
+          start_time: 60.minutes.ago,
+          end_time: Time.now,
+          statistics: ['Average'],
+          period: 60 * 60,
+          unit: 'Kilobytes'
+        }) 
+      
+      puts metrics
+      "#{metrics.datapoints[0][:average].round(2)}"
+    #rescue
+     # 'Not Available'
+   #end   
   end
   
   def save_access_keys

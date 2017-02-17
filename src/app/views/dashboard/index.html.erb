@@ -76,10 +76,10 @@ Refresh
      <th>Region</th>
      <th>Stack Name</th>
      <th>Description</th>
-     <th style="width: 100px;">MyBB Url</th>
-     <th>Healthy Web Servers</th>     
-     <th>Avg CPU Usage</th>
-     <th>Avg Network Data In/Out</th>     
+     <th>MyBB Url</th>
+     <th style="text-align: centerx; width: 120px;">Healthy Web Servers</th>     
+     <th style="text-align: centerx; width: 150px; word-wrap:break-word;">Avg CPU Usage for last 30 minutes</th>
+     <th style="text-align: centerx; width: 170px; word-wrap:break-word;">Avg Network Data In/Out for last 1 hour</th>     
      <th>Status</th>
   </tr>  
   <tr ng-repeat="stack in stacks track by $index">  
@@ -88,9 +88,9 @@ Refresh
     <td>{{stack.name}}</td>
     <td>{{stack.description}}</td>
     <td><a href={{stack.app_url}}>Open</a></td>
-    <td>0/0</td>
-    <td>0 %</td>
-    <td>0</td>
+    <td>{{stack.healthy_instances}}</td>
+    <td>{{stack.cpu_usage}}</td>
+    <td>{{stack.data_usage}}</td>
     <td>{{stack.stack_status}}</td>
   </tr>
 </table>  
