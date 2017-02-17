@@ -15,8 +15,10 @@ class DashboardController < ApplicationController
 
     stacks = []
     regions.each do |region|
-      stacks_aws = Aws::CloudFormation::Client.new(region: region[:short_name]).describe_stacks.stacks 
-          
+      cf_client = Aws::CloudFormation::Client.new(region: region[:short_name])
+      
+      stacks_aws = cf_client.describe_stacks.stacks
+      
       stacks_aws.each do |stack_aws|
         stack_dash = StackDash.new
         
@@ -32,11 +34,18 @@ class DashboardController < ApplicationController
         
         stack_dash.stack_status = stack_aws.stack_status
         
+        get_elb_status(cf_client, stack_dash.name)
         stacks.push(stack_dash)
       end
     end
     
     render json: stacks
+  end
+  
+  def get_elb_status(cf_client, stack_name)
+    resp = cf_client.describe_stack_resource({stack_name: "StackName", logical_resource_id: "LogicalResourceId"})
+    
+    puts "rere " + resp
   end
   
   def save_access_keys
@@ -56,6 +65,7 @@ class DashboardController < ApplicationController
   
     render json: keys
   end
+  
   
   def greet
     ticket_type = {

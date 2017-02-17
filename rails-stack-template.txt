@@ -945,6 +945,7 @@
           "/opt/aws/bin/cfn-init -v ",
           "    --stack ", { "Ref" : "AWS::StackId" },
           "    --resource MyBBWebServerLaunchConfig ",
+          "    --configsets full_install ",
           "    --region ", { "Ref" : "AWS::Region" }, "\n",
 
           "# Signal copletion\n",
