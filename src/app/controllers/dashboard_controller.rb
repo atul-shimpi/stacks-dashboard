@@ -5,13 +5,19 @@ class DashboardController < ApplicationController
   def index
   end
   
-  def get_stacks
+  def get_stacks_
+  Aws.use_bundled_cert!
+   Aws.config.update({
+      region: 'us-east-1',
+      credentials: Aws::Credentials.new(ENV['access-key'], ENV['secret-key'])
+    })
+    
     puts get_data_usage('us-east-1', 'MyBB-MyBBWebServerAutoscalingGroup-1RIU05EX08YSR')
     
     render json: { stacks: 'Atul Shmpi' }
   end
   
-  def get_stacks_
+  def get_stacks
     Aws.use_bundled_cert!
     
     Aws.config.update({
@@ -42,7 +48,7 @@ class DashboardController < ApplicationController
         
         # get metrics
         metrics =  get_metrics(region[:short_name], cf_client, stack_dash.name)
-        
+        puts metrics
         stack_dash.healthy_instances = metrics[:healthy_instances_count]
         stack_dash.cpu_usage = metrics[:cpu_usage]
         stack_dash.data_usage = metrics[:data_usage]
@@ -65,6 +71,8 @@ class DashboardController < ApplicationController
     metrics[:healthy_instances_count] = get_healthy_instances_count(region, resources[:elb_name])
     # get cpu usage
     metrics[:cpu_usage] = get_cpu_usage(region, resources[:asg_name])   
+    # get data usage
+    metrics[:data_usage] = get_data_usage(region, resources[:asg_name])  
     
     metrics
   end
@@ -141,24 +149,40 @@ class DashboardController < ApplicationController
   def get_data_usage(region, asg_name)
     return 'Not Available' if asg_name.nil? 
     
-    #begin      
-      metrics = Aws::CloudWatch::Client.new(region: region)
-        .get_metric_statistics({
-          namespace: 'AWS/EC2',
-          metric_name: 'NetworkOut',
-          dimensions: [{ name: 'AutoScalingGroupName', value: asg_name }],
-          start_time: 60.minutes.ago,
-          end_time: Time.now,
-          statistics: ['Average'],
-          period: 60 * 60,
-          unit: 'Kilobytes'
-        }) 
+    begin
+      cw_client = Aws::CloudWatch::Client.new(region: region)
       
-      puts metrics
-      "#{metrics.datapoints[0][:average].round(2)}"
-    #rescue
-     # 'Not Available'
-   #end   
+      # get data in
+      metrics = cw_client.get_metric_statistics({
+        namespace: 'AWS/EC2',
+        metric_name: 'NetworkIn',
+        dimensions: [{ name: 'AutoScalingGroupName', value: asg_name }],
+        start_time: 60.minutes.ago,
+        end_time: Time.now,
+        statistics: ['Average'],
+        period: 60 * 60
+      }) 
+      
+      # convert byte to gb
+      data_in =  (metrics.datapoints[0][:average] / (1024.0 * 1024.0)).round(2)
+      
+      # get data out
+      metrics = cw_client.get_metric_statistics({
+        namespace: 'AWS/EC2',
+        metric_name: 'NetworkOut',
+        dimensions: [{ name: 'AutoScalingGroupName', value: asg_name }],
+        start_time: 60.minutes.ago,
+        end_time: Time.now,
+        statistics: ['Average'],
+        period: 60 * 60
+      }) 
+      
+      # convert byte to gb
+      data_out =  (metrics.datapoints[0][:average] / (1024.0 * 1024.0)).round(2)
+      "#{data_in} gb / #{data_out} gb"
+    rescue
+     'Not Available'
+   end   
   end
   
   def save_access_keys

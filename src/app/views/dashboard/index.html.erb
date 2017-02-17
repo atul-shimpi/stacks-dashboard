@@ -32,6 +32,7 @@ Refresh
             <label class="control-label col-sm-4" for="type">Access Key Id</label>
             <div class="col-sm-8">
               <input
+                autocomplete="off"
                 id="accesskey"
                 type="text"
                 class="form-control"
@@ -45,6 +46,7 @@ Refresh
             <label class="control-label col-sm-4" for="type">Secret Access Key</label>
             <div class="col-sm-8">
               <input
+                autocomplete="off"
                 id="secretkey"
                 type="text"
                 class="form-control"
@@ -87,7 +89,7 @@ Refresh
     <td>{{stack.region}}</td>
     <td>{{stack.name}}</td>
     <td>{{stack.description}}</td>
-    <td><a href={{stack.app_url}}>Open</a></td>
+    <td><a href={{stack.app_url}} target="_blank">Open</a></td>
     <td>{{stack.healthy_instances}}</td>
     <td>{{stack.cpu_usage}}</td>
     <td>{{stack.data_usage}}</td>
