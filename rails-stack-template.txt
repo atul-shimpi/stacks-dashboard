@@ -597,7 +597,7 @@
       },
       "CreationPolicy" : {
         "ResourceSignal" : {
-          "Timeout" : "PT10M",
+          "Timeout" : "PT30M",
           "Count"   : { "Ref" : "WebServerCount" }
         }
       },
