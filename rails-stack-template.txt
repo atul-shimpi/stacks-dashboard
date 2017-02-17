@@ -755,10 +755,10 @@
                 "content": { "Fn::Join" : ["", [
                   "[cfn-auto-reloader-hook]\n",
                   "triggers=post.update\n",
-                  "path=Resources.WebServer.Metadata.AWS::CloudFormation::Init\n",
+                  "path=Resources.MyBBWebServerLaunchConfig.Metadata.AWS::CloudFormation::Init\n",
                   "action=/opt/aws/bin/cfn-init -v ",
                   "         --stack ", { "Ref" : "AWS::StackName" },
-                  "         --resource WebServer ",
+                  "         --resource MyBBWebServerLaunchConfig ",
                   "         --configsets full_install ",
                   "         --region ", { "Ref" : "AWS::Region" }, "\n",
                   "runas=root\n"
