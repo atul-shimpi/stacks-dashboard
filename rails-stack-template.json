@@ -252,7 +252,7 @@
     "PublicSubnetA" : {
       "Type" : "AWS::EC2::Subnet",
       "Properties" : {
-        "AvailabilityZone" : { "Fn::Select" : [ "2", { "Fn::GetAZs" : "" } ] },
+        "AvailabilityZone" : { "Fn::Select" : [ "0", { "Fn::GetAZs" : "" } ] },
         "VpcId" : { "Ref" : "VPC" },
         "CidrBlock" : { "Fn::FindInMap" : [ "SubnetConfig", "PublicA", "CIDR" ]},
         "Tags" : [
@@ -265,7 +265,7 @@
     "PublicSubnetB" : {
       "Type" : "AWS::EC2::Subnet",
       "Properties" : {
-        "AvailabilityZone" : { "Fn::Select" : [ "3", { "Fn::GetAZs" : "" } ] },
+        "AvailabilityZone" : { "Fn::Select" : [ "1", { "Fn::GetAZs" : "" } ] },
         "VpcId" : { "Ref" : "VPC" },
         "CidrBlock" : { "Fn::FindInMap" : [ "SubnetConfig", "PublicB", "CIDR" ]},
         "Tags" : [
@@ -412,7 +412,7 @@
     "PrivateSubnetA" : {
       "Type" : "AWS::EC2::Subnet",
       "Properties" : {
-        "AvailabilityZone" : { "Fn::Join" : [ "", [ { "Ref" : "AWS::Region" }, "a" ] ] },
+        "AvailabilityZone" : { "Fn::Select" : [ "0", { "Fn::GetAZs" : "" } ] },
         "CidrBlock" : { "Fn::FindInMap" : [ "SubnetConfig", "PrivateA", "CIDR" ]},
         "VpcId" : { "Ref" : "VPC" },
         "Tags" : [
@@ -425,7 +425,7 @@
     "PrivateSubnetB" : {
       "Type" : "AWS::EC2::Subnet",
       "Properties" : {
-        "AvailabilityZone" : { "Fn::Join" : [ "", [ { "Ref" : "AWS::Region" }, "b" ] ] },
+        "AvailabilityZone" : { "Fn::Select" : [ "1", { "Fn::GetAZs" : "" } ] },
         "CidrBlock" : { "Fn::FindInMap" : [ "SubnetConfig", "PrivateB", "CIDR" ]},
         "VpcId" : { "Ref" : "VPC" },
         "Tags" : [
@@ -568,8 +568,8 @@
       "Type" : "AWS::AutoScaling::AutoScalingGroup",
       "Properties" : {
         "AvailabilityZones" : [
-          { "Fn::Select" : [ "2", { "Fn::GetAZs" : "" } ] },
-          { "Fn::Select" : [ "3", { "Fn::GetAZs" : "" } ] }
+          { "Fn::Select" : [ "0", { "Fn::GetAZs" : "" } ] },
+          { "Fn::Select" : [ "1", { "Fn::GetAZs" : "" } ] }
         ],
         "VPCZoneIdentifier" : [
           { "Ref" : "PublicSubnetA" },
